@@ -1,4 +1,4 @@
-import os
+import os, sys
 
 import json as _json
 
@@ -27,5 +27,9 @@ def adapter():
     return Response(response, mimetype="application/json")
 
 if __name__ == "__main__":
-    app.config['ALLOWED_USER'] = os.environ['USER']
-    app.run()
+    try:
+        app.config['ALLOWED_USER'] = os.environ['USER']
+    except KeyError:
+        sys.stdout.write("Error: Configuration environment variable USER not provided. Specify an image username on the Docker command-line by using docker run -e USER=<user>\n")
+        sys.exit(1)
+    app.run(port=80)
