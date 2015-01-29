@@ -15,7 +15,10 @@ def adapter():
     docker_json = _json.loads(decoded['ClientRequest']['Body'])
     image = docker_json['Image']
 
-    user = image.split("/")[0]
+    if "/" not in image:
+        user = "_"
+    else:
+        user = image.split("/")[0]
     if user != app.config['ALLOWED_USER']:
         return '', 403
 
