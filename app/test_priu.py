@@ -13,7 +13,7 @@ class FlaskrTestCase(unittest.TestCase):
 
     def test_integration_create_user_success(self):
         """
-        The request is return unmodified when the user is allowed.
+        The request is returned unmodified when the user is allowed.
         """
         path = "/v1.16/containers/create"
         json = r'{"Hostname":"","Domainname":"","User":"","Memory":0,"MemorySwap":0,"CpuShares":0,"Cpuset":"","AttachStdin":false,"AttachStdout":true,"AttachStderr":true,"PortSpecs":null,"ExposedPorts":{},"Tty":false,"OpenStdin":false,"StdinOnce":false,"Env":[],"Cmd":null,"Image":"good/container","Volumes":{},"WorkingDir":"","Entrypoint":null,"NetworkDisabled":false,"MacAddress":"","OnBuild":null,"HostConfig":{"Binds":null,"ContainerIDFile":"","LxcConf":[],"Privileged":false,"PortBindings":{},"Links":null,"PublishAllPorts":false,"Dns":null,"DnsSearch":null,"ExtraHosts":null,"VolumesFrom":null,"Devices":[],"NetworkMode":"bridge","IpcMode":"","CapAdd":null,"CapDrop":null,"RestartPolicy":{"Name":"","MaximumRetryCount":0},"SecurityOpt":null}}'
@@ -26,6 +26,19 @@ class FlaskrTestCase(unittest.TestCase):
         self.assertEquals(rv.status_code, 200)
         self.assertEquals(rv.data, expected_json)
         self.assertEquals(rv.headers['content-type'], "application/json")
+
+    def test_integration_create_user_fail(self):
+        """
+        The status code is 401 when the user is bad.
+        """
+        path = "/v1.16/containers/create"
+        json = r'{"Hostname":"","Domainname":"","User":"","Memory":0,"MemorySwap":0,"CpuShares":0,"Cpuset":"","AttachStdin":false,"AttachStdout":true,"AttachStderr":true,"PortSpecs":null,"ExposedPorts":{},"Tty":false,"OpenStdin":false,"StdinOnce":false,"Env":[],"Cmd":null,"Image":"bad/container","Volumes":{},"WorkingDir":"","Entrypoint":null,"NetworkDisabled":false,"MacAddress":"","OnBuild":null,"HostConfig":{"Binds":null,"ContainerIDFile":"","LxcConf":[],"Privileged":false,"PortBindings":{},"Links":null,"PublishAllPorts":false,"Dns":null,"DnsSearch":null,"ExtraHosts":null,"VolumesFrom":null,"Devices":[],"NetworkMode":"bridge","IpcMode":"","CapAdd":null,"CapDrop":null,"RestartPolicy":{"Name":"","MaximumRetryCount":0},"SecurityOpt":null}}'
+        request_json = self._make_powerstrip_pre_hook_request("POST", path, json)
+
+        rv = self.app.post("/", data=request_json, headers={
+            "content-type": "application/json"})
+
+        self.assertEquals(rv.status_code, 401)
 
     def _make_powerstrip_pre_hook_request(self, method, path, json):
         """
