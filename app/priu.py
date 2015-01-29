@@ -1,11 +1,23 @@
 import os
 
-from flask import Flask
+import json as _json
+
+from flask import Flask, request
 app = Flask(__name__)
+app.debug = True
+
+import lib
 
 @app.route("/", methods=["HEAD", "GET", "POST", "DELETE", "PUT"])
 def adapter():
-    return "Some data"
+    json = request.get_data()
+    decoded = _json.loads(json)
+    response = lib.pre_hook_response(
+        decoded['ClientRequest']['Method'],
+        decoded['ClientRequest']['Request'],
+        decoded['ClientRequest']['Body'],
+    )
+    return response
 
 if __name__ == "__main__":
     app.config['ALLOWED_USER'] = os.environ['USER']
