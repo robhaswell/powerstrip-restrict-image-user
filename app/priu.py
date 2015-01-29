@@ -2,7 +2,7 @@ import os
 
 import json as _json
 
-from flask import Flask, request
+from flask import Flask, Response, request
 app = Flask(__name__)
 app.debug = True
 
@@ -17,7 +17,7 @@ def adapter():
         decoded['ClientRequest']['Request'],
         decoded['ClientRequest']['Body'],
     )
-    return response
+    return Response(response, mimetype="application/json")
 
 if __name__ == "__main__":
     app.config['ALLOWED_USER'] = os.environ['USER']
